@@ -8,14 +8,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+//--Implementacao padrao do IDistributedCache (session)
+builder.Services.AddMemoryCache();
+builder.Services.AddSession();
+//--
+
+//--Implementacao do HttpContext
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 builder.Services.AddTransient<ILancheRepository, LancheRepository>();
 builder.Services.AddTransient<ICategoriaRepository, CategoriaRepository>();
 
 
+//-- Conexao com o banco e contexto para entity
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options => //Registrando context 
             options.UseSqlServer(connectionString));
+//--
 
 var app = builder.Build();
 
@@ -31,6 +41,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession(); //Session
 
 app.UseAuthorization();
 
