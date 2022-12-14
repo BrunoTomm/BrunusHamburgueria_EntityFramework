@@ -1,4 +1,5 @@
 using BrunusBurguer.Context;
+using BrunusBurguer.Models;
 using BrunusBurguer.Repositories;
 using BrunusBurguer.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddTransient<ILancheRepository, LancheRepository>();
 builder.Services.AddTransient<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped(sp => CarrinhoCompra.GetCarrinho(sp)); //registrando o serviço e já criando um carrinho -- Scoped (uma instancia a cada request, se dois clientes solicitarem um carrinho, cada um terá uma instancia diferente pois sao requests diferentes)
 
 
 //-- Conexao com o banco e contexto para entity
@@ -44,6 +46,11 @@ app.UseRouting();
 app.UseSession(); //Session
 
 app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "categoriaFiltro",
+    pattern: "Lanche/{action}/{categoria?}",
+    defaults: new { Controller = "Lanche", action = "List" });
 
 app.MapControllerRoute(
     name: "default",
